@@ -8,4 +8,4 @@ AllCops:
 
 Style/Documentation:
   Exclude:
-    - 'lib/wiki_builder/version.rb'
+    - 'lib/wiki_builder/version.rb' # No need to document `WikiBuilder` there
