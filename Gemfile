@@ -11,4 +11,6 @@ end
 
 group :test do
   gem 'rubocop'
+  gem 'rspec', '~> 3.3.0'
+  gem 'fuubar'
 end
