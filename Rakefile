@@ -3,26 +3,22 @@ LIBPATH     = File.join(File.expand_path(CURRENTPATH), 'lib')
 
 $LOAD_PATH.unshift(LIBPATH) unless $LOAD_PATH.include?(LIBPATH)
 
-require 'colorize'
 require 'ruby-progressbar'
 
 require 'yard'
 require 'rubocop/rake_task'
+require 'rspec/core/rake_task'
 
 require 'wiki_builder'
 
 PROGRESS_FORMAT = '%t: |%w%i| %E'
 
 task default: [:settings] do
-  puts 'Einstellungen:'.bold.cyan
-  puts 'Aktuelles Verzeichnis:'.cyan.underline + ' ' + CURRENTPATH.blue
-  puts 'Quelldateien:'.cyan.underline + ' ' + WikiBuilder::Settings[:articles]
-  puts 'Base URL:'.cyan.underline + ' ' + WikiBuilder::Settings[:base]
-  puts 'git-url:'
-
-  puts 'Artikel-Index existiert?'.cyan.underline +
-         ' ' +
-         WikiBuilder::Settings.index_exists_as_string?
+  puts '*** Einstellungen:'
+  puts "** Aktuelles Verzeichnis: #{CURRENTPATH}"
+  puts "** Quelldateien: #{WikiBuilder::Settings[:articles]}"
+  puts "** Base URL: #{WikiBuilder::Settings[:base]}"
+  puts '** git-url:'
 
   progressbar = ProgressBar.create(title:  'Erstelle Index',
                                    format: PROGRESS_FORMAT)
@@ -50,7 +46,8 @@ RuboCop::RakeTask.new do |t|
   t.fail_on_error = false
 end
 
+RSpec::Core::RakeTask.new(:spec)
+
 desc 'Run tests'
-task test: [:docstat, :rubocop] do
-  puts tests.inspect
+task test: [:docstat, :rubocop, :spec] do
 end
