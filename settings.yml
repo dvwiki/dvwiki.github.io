@@ -1,2 +1,6 @@
 settings:
   articles: 'articles'
+  github:
+    sources: 'dvwiki/dvwiki.github.io'
+    pages: 'dvwiki.github.io'
+  htmlsuffix: 'htm'
