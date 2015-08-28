@@ -6,6 +6,9 @@ $LOAD_PATH.unshift(LIBPATH) unless $LOAD_PATH.include?(LIBPATH)
 require 'colorize'
 require 'ruby-progressbar'
 
+require 'yard'
+require 'rubocop/rake_task'
+
 require 'wiki_builder'
 
 PROGRESS_FORMAT = '%t: |%w%i| %E'
@@ -18,8 +21,8 @@ task default: [:settings] do
   puts 'git-url:'
 
   puts 'Artikel-Index existiert?'.cyan.underline +
-    ' ' +
-    WikiBuilder::Settings.index_exists_as_string?
+         ' ' +
+         WikiBuilder::Settings.index_exists_as_string?
 
   progressbar = ProgressBar.create(title:  'Erstelle Index',
                                    format: PROGRESS_FORMAT)
@@ -34,30 +37,20 @@ task :settings do
   WikiBuilder::Settings.load
 end
 
-tests = []
-unless Gem.find_files('yard').empty?
-  require 'yard'
+desc 'Generate documentation via yard'
+YARD::Rake::YardocTask.new(:doc)
 
-  desc 'Generate documentation via yard'
-  YARD::Rake::YardocTask.new(:doc)
-
-  tests << :docstat
-  YARD::Rake::YardocTask.new(:docstat) do |t|
-    t.options << '--no-private'
-    t.stats_options << '--list-undoc'
-  end
+YARD::Rake::YardocTask.new(:docstat) do |t|
+  t.options << '--no-private'
+  t.stats_options << '--list-undoc'
 end
 
-unless Gem.find_files('rubocop').empty?
-  tests << :rubocop
-  require 'rubocop/rake_task'
-  RuboCop::RakeTask.new do |t|
-    t.formatters = ['fuubar']
-    t.fail_on_error = false
-  end
+RuboCop::RakeTask.new do |t|
+  t.formatters    = ['fuubar']
+  t.fail_on_error = false
 end
 
 desc 'Run tests'
-task test: tests do
+task test: [:docstat, :rubocop] do
   puts tests.inspect
 end
